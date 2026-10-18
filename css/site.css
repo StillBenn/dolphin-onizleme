@@ -137,7 +137,7 @@ html:not(.is-loading) .vf { opacity: calc(1 - var(--film-end, 0)); }
 .vf__tc { position: absolute; top: 0.9rem; right: 1.5rem; font: 400 0.7rem/1 var(--f-mono); letter-spacing: 0.12em; color: rgba(239, 235, 228, 0.72); font-variant-numeric: tabular-nums; direction: ltr; }
 @media (max-width: 760px) { .vf { inset: calc(var(--hdr-h) + 0.6rem) 0.7rem calc(4.6rem + var(--bar)); } .vf__rec, .vf__tc { top: 0.7rem; } .vf__rec { left: 1rem; } .vf__tc { right: 1rem; } }
 /* the words: on the left, like a film's titles; a title card at the end */
-.film__beat { position: absolute; z-index: 3; inset-inline-start: calc(var(--pad) + 1.5rem); top: 50%; transform: translateY(-38%); max-width: min(44rem, 54vw); color: var(--paper); visibility: hidden; }
+.film__beat { position: absolute; z-index: 3; inset-inline-start: calc(var(--pad) + 1.5rem); top: 50%; transform: translateY(-38%); max-width: min(40rem, 42vw);   /* the left of the frame: the subject sits in its middle */ color: var(--paper); visibility: hidden; }
 .film__beat.is-on { visibility: visible; }
 .film__beat--end { top: auto; bottom: calc(clamp(5rem, 13vh, 8rem) + var(--bar)); transform: none; }
 /* over the light table's white the words get their own dark card, like a title held up to the lens */
@@ -147,7 +147,7 @@ html:not(.is-loading) .vf { opacity: calc(1 - var(--film-end, 0)); }
   .film__beat { top: auto; bottom: calc(clamp(6.2rem, 13vh, 7.6rem) + var(--bar)); transform: none; inset-inline: calc(var(--pad) + 0.4rem); max-width: none; }
 }
 .film__label { margin-bottom: 1.4rem; opacity: 0; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6); }
-.film__title { font: 600 clamp(2.1rem, 0.9rem + 4.1vw, 5.4rem)/0.96 var(--f-sans); font-stretch: 125%; letter-spacing: -0.02em; text-transform: uppercase; filter: drop-shadow(0 2px 22px rgba(0, 0, 0, 0.5)); }
+.film__title { font: 600 clamp(2rem, 0.8rem + 3.4vw, 4.6rem)/0.96 var(--f-sans); font-stretch: 125%; letter-spacing: -0.02em; text-transform: uppercase; filter: drop-shadow(0 2px 22px rgba(0, 0, 0, 0.5)); }
 html[dir="rtl"] .film__title { font-family: var(--f-ar); font-weight: 600; line-height: 1.4; letter-spacing: 0; text-transform: none; }
 .film__title em { font-style: normal; color: var(--amber-2); }
 .film__line { display: block; overflow: hidden; padding: 0.1em 0; margin-top: -0.1em; }
