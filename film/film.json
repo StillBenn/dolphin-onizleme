@@ -1,0 +1,38 @@
+{
+  "vhPerFrame": 3.0,
+  "tone": "dark",
+  "vignette": 0.2,
+  "grain": 0.014,
+  "autoplay": 28,
+  "autoplayMs": 3200,
+  "endTone": "dark",
+  "chapters": [
+    {
+      "dir": "ch1/",
+      "vh": 2.8,
+      "crisp": 0.2
+    },
+    {
+      "dir": "ch2/",
+      "vh": 3.0,
+      "crisp": 0.2
+    },
+    {
+      "dir": "ch3/",
+      "vh": 2.8,
+      "crisp": 0.2
+    },
+    {
+      "dir": "ch4/",
+      "vh": 2.8,
+      "crisp": 0.2
+    },
+    {
+      "dir": "ch5/",
+      "vh": 3.0,
+      "crisp": 0.2
+    }
+  ],
+  "handoff": true,
+  "holdVh": 40
+}
