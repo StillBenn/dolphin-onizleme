@@ -22,7 +22,7 @@
   /* ---- scroll-linked parts, one rAF ---------------------------------------- */
   var film = document.querySelector('.film[data-film="main"]');
   var tc = document.querySelector("[data-tc]");
-  var FRAMES = 570, FPS = 25;                 /* the film's length (film/film.json, its chapters less the dissolve) */
+  var FRAMES = 706, FPS = 25;                 /* the film's length (film/film.json, its chapters less the dissolve) */
   var reelBox = document.querySelector("[data-reel]"), strip = reelBox && reelBox.querySelector(".reel__strip");
   var story = document.querySelector(".story");
   var credits = document.querySelector(".credits"), roll = document.querySelector("[data-roll]"), list = roll && roll.querySelector(".credits__list");
@@ -139,6 +139,9 @@
     vid.addEventListener("click", function () { if (vid.paused) vid.play(); else vid.pause(); });
     muteBtn.addEventListener("click", function () { vid.muted = !vid.muted; muteBtn.classList.toggle("is-on", vid.muted); });
     vid.addEventListener("play", function () { dlg.classList.add("is-playing"); });
+    /* while the film is still on its way (it streams from the agency's own server), a quiet sign that it is coming */
+    ["loadstart", "waiting", "stalled"].forEach(function (ev) { vid.addEventListener(ev, function () { dlg.classList.add("is-wait"); }); });
+    ["canplay", "playing", "pause", "error"].forEach(function (ev) { vid.addEventListener(ev, function () { dlg.classList.remove("is-wait"); }); });
     vid.addEventListener("pause", function () { dlg.classList.remove("is-playing"); });
     vid.addEventListener("ended", function () { dlg.classList.remove("is-playing"); if (dlg.open) step(1); });   /* a showreel: the next film follows */
     var reelBtn = document.querySelector("[data-showreel]");
