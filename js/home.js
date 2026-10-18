@@ -33,12 +33,12 @@
   window.FilmIntro = { progress: paint, done: lift };
   setTimeout(lift, 16000);           /* never trapped behind the leader */
 
-  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  if ("scrollRestoration" in history && document.querySelector('.film[data-film="main"]')) history.scrollRestoration = "manual";   /* the film's page only: the others keep the reader's place */
   var hashEl = location.hash.length > 1 && document.getElementById(decodeURIComponent(location.hash.slice(1)));
   if (hashEl) {
     var moved = false;
     ["wheel", "touchstart", "keydown", "pointerdown"].forEach(function (t) { addEventListener(t, function () { moved = true; }, { once: true, passive: true }); });
-    var settle = function () { if (!moved) window.scrollTo(0, hashEl.getBoundingClientRect().top + scrollY); };
+    var settle = function () { if (!moved) window.scrollTo(0, hashEl.getBoundingClientRect().top + scrollY - (parseFloat(getComputedStyle(hashEl).scrollMarginTop) || 0)); };
     addEventListener("film:layout", function (e) { if (e.detail && e.detail.id === "main") settle(); });
     addEventListener("load", settle);
     setTimeout(function () { moved = true; }, 6000);
@@ -59,11 +59,12 @@
   stuck();
 
   var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var groups = [].slice.call(document.querySelectorAll(".sec-head > div, .sec-head > .sec-lead, .story__head, .figs, .chips, .air__text, .air__board, .contact__text, .slate, .foot__top, .foot__cols"));
+  var groups = [].slice.call(document.querySelectorAll(".sec-head > div, .sec-head > .sec-lead, .story__head, .figs, .chips, .air__text, .air__board, .contact__text, .slate, .foot__top, .foot__cols, " +
+    ".intro__text, .work__more, .about__text, .quote-card, .ways__list, .sx__text, .sx__list, .flow__head, .steps, .srv__text, .cta"));
   if (!reduced && "IntersectionObserver" in window && groups.length) {
     html.classList.add("rv");
     groups.forEach(function (g) {
-      var parts = g.matches(".sec-lead, .slate, .chips") ? [g] : [].slice.call(g.children);
+      var parts = g.matches(".sec-lead, .slate, .chips, .work__more, .quote-card, .ways__list") ? [g] : [].slice.call(g.children);
       parts.forEach(function (el, i) { el.classList.add("rv__p"); el.style.setProperty("--i", Math.min(i, 8)); });
     });
     var io = new IntersectionObserver(function (es) {

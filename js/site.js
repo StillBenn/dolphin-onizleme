@@ -6,7 +6,8 @@
    · the figures count up once, when they come on screen
    · the commercials: filter by sector, play one in the player (keyboard:
      space, ←/→ to seek, ↑/↓ for the next/previous film, Esc to close)
-   · the services: a clip of the film opens beside the line pointed at
+   · a page's opening still drifts slower than the page, its words fade
+   · the services: each scene's clip plays while it is on screen
    · the brands roll like end credits as their section scrolls
    · the slate: filled in, it claps and opens WhatsApp or the mail app with
      a message written from it
@@ -26,9 +27,17 @@
   var reelBox = document.querySelector("[data-reel]"), strip = reelBox && reelBox.querySelector(".reel__strip");
   var story = document.querySelector(".story");
   var credits = document.querySelector(".credits"), roll = document.querySelector("[data-roll]"), list = roll && roll.querySelector(".credits__list");
+  var phero = document.querySelector(".phero"), pPic = phero && phero.querySelector(".phero__pic img"), pIn = phero && phero.querySelector(".phero__in");
   var lastTc = "";
   function tick() {
     var vh = innerHeight;
+    if (phero && !reduced) {
+      var hr = phero.getBoundingClientRect();
+      if (hr.bottom > 0) {
+        pPic.style.setProperty("--py", (-hr.top * 0.3).toFixed(1));
+        pIn.style.setProperty("--pf", clamp(-hr.top / (hr.height * 0.55), 0, 1).toFixed(3));
+      }
+    }
     if (film && tc) {
       var r = film.getBoundingClientRect(), len = r.height - vh;
       if (r.bottom > 0 && len > 0) {
@@ -80,6 +89,7 @@
   var items = [].slice.call(document.querySelectorAll("[data-works] .wk"));
   var all = document.querySelector('[data-n="*"]');
   if (all) all.textContent = items.length;
+  var shown = document.querySelector("[data-shown]"), bar = document.querySelector("[data-filter-bar]");
   chips.forEach(function (c) {
     c.addEventListener("click", function () {
       var f = c.dataset.f;
@@ -88,8 +98,26 @@
       items.forEach(function (it) {
         var on = f === "*" || it.dataset.sec === f;
         it.classList.toggle("is-out", !on);
-        if (on) { it.style.setProperty("--i", k % 8); k++; }
+        it.classList.remove("is-shown");
+        if (on) { it.style.setProperty("--i", k % 12); k++; }
       });
+      if (shown) shown.textContent = k;
+      if (!reduced) {
+        void items[0].offsetWidth;                              /* the shown ones come in again, in order */
+        items.forEach(function (it) { if (!it.classList.contains("is-out")) it.classList.add("is-shown"); });
+      }
+      /* the chip pressed comes to the middle of its row (a phone's row scrolls sideways) */
+      var box = c.parentNode;
+      if (box.scrollWidth > box.clientWidth + 1) {
+        var cr = c.getBoundingClientRect(), br = box.getBoundingClientRect();
+        box.scrollBy({ left: cr.left + cr.width / 2 - (br.left + br.width / 2), behavior: reduced ? "auto" : "smooth" });
+      }
+      /* the grid's top is brought back under the bar if the reader was further down */
+      if (bar) {
+        /* where the bar stands once stuck (its own rect is wrong when the reader is below the grid: the bar has scrolled off with it) */
+        var g = document.querySelector("[data-works]").getBoundingClientRect().top, top = (parseFloat(getComputedStyle(bar).top) || 0) + bar.offsetHeight + 12;
+        if (g < top) window.scrollTo({ top: scrollY + g - top, behavior: reduced ? "auto" : "smooth" });
+      }
     });
   });
   document.querySelectorAll(".wk__media img").forEach(function (img) {
@@ -261,23 +289,46 @@
     }
   }
 
-  /* ---- services: the clip beside the line ------------------------------------------------------ */
-  var svcs = [].slice.call(document.querySelectorAll("[data-sched] .svc"));
-  var narrow = matchMedia("(max-width: 980px)");
-  function wake(v) { if (!v.src && v.dataset.src) v.src = v.dataset.src; var p = v.play(); if (p && p.catch) p.catch(function () {}); }
-  svcs.forEach(function (s) {
-    var v = s.querySelector("video");
-    if (!v) return;
-    s.addEventListener("pointerenter", function () { if (!narrow.matches) wake(v); });
-    s.addEventListener("focus", function () { wake(v); });
-    s.addEventListener("pointerleave", function () { if (!narrow.matches) v.pause(); });
-    s.addEventListener("blur", function () { v.pause(); });
-  });
-  if ("IntersectionObserver" in window) {
-    var sio = new IntersectionObserver(function (es) {
-      es.forEach(function (e) { var v = e.target.querySelector("video"); if (!v || !narrow.matches) return; if (e.isIntersecting) wake(v); else v.pause(); });
-    }, { threshold: 0.6 });
-    svcs.forEach(function (s) { sio.observe(s); });
+  /* ---- services: each scene's clip plays while it is on screen ------------------------------------------- */
+  var scenes = [].slice.call(document.querySelectorAll(".srv"));
+  if (scenes.length && "IntersectionObserver" in window) {
+    /* every clip's player is set up while the page is idle after loading, one at a time: setting one up
+       mid-scroll cost a frame (~25 ms, measured); then only what is near is fetched in full */
+    var idle = window.requestIdleCallback || function (f) { return setTimeout(f, 200); };
+    var prep = scenes.map(function (sc) { return sc.querySelector("video"); }).filter(Boolean);
+    var next = function () {
+      var v = prep.shift();
+      if (!v) return;
+      if (!v.src && v.dataset.src) { v.preload = "metadata"; v.src = v.dataset.src; }
+      setTimeout(function () { idle(next, { timeout: 1500 }); }, 250);
+    };
+    if (document.readyState === "complete") idle(next, { timeout: 1500 }); else addEventListener("load", function () { idle(next, { timeout: 1500 }); });
+    var near = new IntersectionObserver(function (es) {           /* the clip comes in full a little before it is reached */
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var v = e.target.querySelector("video");
+        if (v && !v.src && v.dataset.src) v.src = v.dataset.src;
+        if (v) v.preload = "auto";
+        near.unobserve(e.target);
+      });
+    }, { rootMargin: "0px 0px 80% 0px" });
+    var seen = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        var v = e.target.querySelector("video");
+        if (!v) return;
+        if (e.isIntersecting && !reduced) {
+          if (!v.src && v.dataset.src) v.src = v.dataset.src;
+          var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
+        } else v.pause();
+      });
+    }, { threshold: 0.35 });
+    scenes.forEach(function (sc) {
+      near.observe(sc); seen.observe(sc);
+      var v = sc.querySelector("video");
+      if (!v) return;
+      v.addEventListener("playing", function () { sc.classList.add("is-playing"); });
+      v.addEventListener("pause", function () { sc.classList.remove("is-playing"); });
+    });
   }
 
   /* ---- the slate --------------------------------------------------------------------------------- */

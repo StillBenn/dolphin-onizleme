@@ -37,32 +37,67 @@
   veil.className = "veil";
   veil.setAttribute("aria-hidden", "true");
   document.body.appendChild(veil);
-  var jumps = 0;
-  function fadeJump(to, then) {
-    if (reduced) { window.scrollTo(0, to); if (then) then(); return; }
-    var mine = ++jumps;                  /* a second jump inside the first one's fade owns the veil from then on */
+  var jumps = 0, VEIL = 420;           /* ms: the veil's way down (css .veil: the same) */
+  /* the jump has landed: wait for the film to show the new moment sharp (film.js __filmSharp), or 1.5 s,
+     then lift. A film that was asleep off screen still carries the state it was left in, so its word is
+     only taken once it has run since the jump (__filmTick). */
+  function whenLanded(mine, lift) {
+    var t0 = performance.now(), frames = 0;
+    (function look() {
+      if (mine !== jumps) return;
+      var film = document.querySelector('[data-film="main"]'), r = film && film.getBoundingClientRect();
+      var near = r && r.top < window.innerHeight && r.bottom > 0 && !window.__filmStill;
+      var fresh = (window.__filmTick || 0) > t0;
+      var ok = !near || (fresh && (film.classList.contains("is-faded") || window.__filmSharp));
+      if (++frames > 2 && (ok || performance.now() - t0 > 1500)) lift();
+      else requestAnimationFrame(look);
+    })();
+  }
+  function veilJump(to, then, mine) {
     veil.classList.add("is-on");
     setTimeout(function () {
       if (mine !== jumps) return;
-      veil.classList.add("is-on");
       window.__filmSharp = false;
       window.scrollTo(0, to);
       if (then) then();
-      /* landing inside the opening film: it has cut to the new moment under the veil, and the
-         veil lifts once that moment is on screen sharp (film.js __filmSharp), or after 1.5 s.
-         The film's word is only taken once it has run since the jump (__filmTick): a film that
-         was asleep off screen still carries the state it was left in. */
-      var t0 = performance.now(), frames = 0;
-      (function lift() {
-        if (mine !== jumps) return;
-        var film = document.querySelector('[data-film="main"]'), r = film && film.getBoundingClientRect();
-        var near = r && r.top < window.innerHeight && r.bottom > 0 && !window.__filmStill;
-        var fresh = (window.__filmTick || 0) > t0;
-        var ok = !near || (fresh && (film.classList.contains("is-faded") || window.__filmSharp));
-        if (++frames > 2 && (ok || performance.now() - t0 > 1500)) veil.classList.remove("is-on");
-        else requestAnimationFrame(lift);
-      })();
-    }, 260);
+      whenLanded(mine, function () { veil.classList.remove("is-on"); });
+    }, VEIL);
+  }
+  /* inside the opening film, from one of its moments to another: a dissolve. The moment on screen is
+     copied over the film (film.js __filmShot), its words fade, the playhead cuts under the copy, and the
+     copy melts into the new moment once that is sharp; the new words come up after it. */
+  function inFilm(y) {
+    var film = document.querySelector('[data-film="main"]');
+    if (!film || window.__filmStill) return null;
+    var top = film.getBoundingClientRect().top + window.scrollY, end = top + film.offsetHeight - window.innerHeight;
+    return y >= top && y <= end ? film : null;
+  }
+  function fadeJump(to, then) {
+    if (reduced) { window.scrollTo(0, to); if (then) then(); return; }
+    var mine = ++jumps;
+    var film = inFilm(to) && inFilm(window.scrollY);
+    var stage = film && film.querySelector(".film__stage");
+    if (!stage || !window.__filmShot) { veilJump(to, then, mine); return; }
+    var took = false;
+    var asked = window.__filmShot(function (shot) {
+      if (mine !== jumps || took) return;
+      took = true;
+      shot.classList.add("is-on");
+      stage.classList.add("is-cut");
+      setTimeout(function () {
+        if (mine !== jumps) { shot.classList.remove("is-on"); stage.classList.remove("is-cut"); return; }
+        window.__filmSharp = false;
+        window.scrollTo(0, to);
+        if (then) then();
+        whenLanded(mine, function () {
+          shot.classList.remove("is-on");
+          setTimeout(function () { stage.classList.remove("is-cut"); }, 380);
+          setTimeout(function () { if (!shot.classList.contains("is-on")) { shot.width = 0; shot.height = 0; } }, 1400);   /* give the copy's memory back */
+        });
+      }, 300);
+    });
+    /* no picture to copy in time (a frame still on its way): the page's fade instead */
+    setTimeout(function () { if (!took && mine === jumps) { took = true; veilJump(to, then, mine); } }, asked ? 160 : 0);
   }
 
   /* the opening film's chapter list (film.js) crosses the page through the same fade */
@@ -182,7 +217,7 @@
     if (!el) return;
     e.preventDefault();
     measure();
-    var to = clamp(el.getBoundingClientRect().top + window.scrollY);
+    var to = clamp(el.getBoundingClientRect().top + window.scrollY - (parseFloat(getComputedStyle(el).scrollMarginTop) || 0));
     var focus = function () { if (a.classList.contains("skip")) { el.setAttribute("tabindex", "-1"); el.focus({ preventScroll: true }); } };
     if (Math.abs(to - window.scrollY) > window.innerHeight * 2.5 || reduced) {
       current = target = written = to; vel = 0; running = false;

@@ -858,6 +858,21 @@ export async function mountFilm(root, primary = true) {
 
   /* Only run while the film is on screen. */
   let visible = true, releaseT = 0;
+  /* A jump inside the film (a chapter on the timeline) dissolves instead of cutting (js/scroll.js): the
+     moment on screen is copied, as it is drawn, into a canvas laid over the film's own; the playhead
+     cuts under the copy, and the copy fades once the new moment is sharp. The copy is taken in the same
+     task as the draw — the WebGL buffer is only readable until the frame is shown. */
+  const shot = document.createElement("canvas");
+  shot.className = "film__shot";
+  shot.setAttribute("aria-hidden", "true");
+  canvas.after(shot);
+  let snapWant = null;
+  if (primary) window.__filmShot = (cb) => {
+    if (!visible || !booted) return false;
+    snapWant = cb;
+    kick();
+    return true;
+  };
   /* Five films on one page: one that has left the screen gives back its GPU
      atlas and its decoded frames after a moment (the compressed frames stay,
      so coming back needs no download, only a decode) */
@@ -1146,6 +1161,12 @@ export async function mountFilm(root, primary = true) {
     if ((lo || hiTarget) && !wait) {
       renderer.draw(atA, a - c.first, atB, b - chapters[kb].first, t, sA === sB ? 0 : sT, hi, now / 1000, GRAIN * (1 - endP), cw, ch, VIG * (1 - endP));
       drawn = true;
+      if (snapWant) {
+        const cb = snapWant; snapWant = null;
+        shot.width = canvas.width; shot.height = canvas.height;
+        shot.getContext("2d").drawImage(canvas, 0, 0);
+        cb(shot);
+      }
     }
     if (Math.abs(endP - endShown) > 0.002) { endShown = endP; root.style.setProperty("--film-end", endP.toFixed(3)); }
     /* film.json "enterFade": the studio comes up out of the page as the film
