@@ -12,6 +12,10 @@
 (function () {
   "use strict";
   var EN = {
+    "Menü": "Menu",
+    "Web tasarım": "Web design",
+    "İşlerimizi izleyin": "Watch our work",
+    "Tümünü arka arkaya izleyin": "Watch them all, one after another",
     "Dolphin Ajans — Bir Anadolu reklamcısı, 1994'ten beri": "Dolphin Ajans — An Anatolian ad agency since 1994",
     "İçeriğe geç": "Skip to content",
     "Dolphin Ajans — başa dön": "Dolphin Ajans — back to top",
@@ -182,6 +186,10 @@
   };
 
   var AR = {
+    "Menü": "القائمة",
+    "Web tasarım": "تصميم الموقع",
+    "İşlerimizi izleyin": "شاهدوا أعمالنا",
+    "Tümünü arka arkaya izleyin": "شاهدوها كلها واحدًا تلو الآخر",
     "Dolphin Ajans — Bir Anadolu reklamcısı, 1994'ten beri": "دولفين — وكالة إعلان أناضولية منذ ١٩٩٤",
     "İçeriğe geç": "انتقل إلى المحتوى",
     "Dolphin Ajans — başa dön": "دولفين — العودة إلى الأعلى",

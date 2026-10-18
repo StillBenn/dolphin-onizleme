@@ -140,7 +140,9 @@
     muteBtn.addEventListener("click", function () { vid.muted = !vid.muted; muteBtn.classList.toggle("is-on", vid.muted); });
     vid.addEventListener("play", function () { dlg.classList.add("is-playing"); });
     vid.addEventListener("pause", function () { dlg.classList.remove("is-playing"); });
-    vid.addEventListener("ended", function () { dlg.classList.remove("is-playing"); });
+    vid.addEventListener("ended", function () { dlg.classList.remove("is-playing"); if (dlg.open) step(1); });   /* a showreel: the next film follows */
+    var reelBtn = document.querySelector("[data-showreel]");
+    if (reelBtn) reelBtn.addEventListener("click", function () { var l = list_(); if (l.length) open(l[0]); });
     vid.addEventListener("loadedmetadata", function () { durEl.textContent = fmt(vid.duration).slice(0, 5); });
     vid.addEventListener("timeupdate", function () {
       if (!vid.duration) return;
@@ -161,6 +163,99 @@
       else if (e.key === "ArrowUp") { e.preventDefault(); step(-1); }
       else if (e.key === "m") { muteBtn.click(); }
     });
+  }
+
+
+  /* ---- the phone's menu ------------------------------------------------------------------------- */
+  var menu = document.querySelector("[data-menu]"), menuBtn = document.querySelector("[data-menu-open]");
+  if (menu && menuBtn) {
+    [].slice.call(menu.querySelectorAll(".menu__list li")).forEach(function (li, i) { li.style.setProperty("--i", i); });
+    var openMenu = function () {
+      menu.hidden = false; html.classList.add("has-menu"); menuBtn.setAttribute("aria-expanded", "true");
+      requestAnimationFrame(function () { requestAnimationFrame(function () { menu.classList.add("is-open"); }); });
+      var c = menu.querySelector("[data-menu-close]"); if (c) c.focus();
+    };
+    var closeMenu = function (keepFocus) {
+      menu.classList.remove("is-open"); html.classList.remove("has-menu"); menuBtn.setAttribute("aria-expanded", "false");
+      setTimeout(function () { if (!menu.classList.contains("is-open")) menu.hidden = true; }, reduced ? 0 : 460);
+      if (!keepFocus) menuBtn.focus();
+    };
+    menuBtn.addEventListener("click", openMenu);
+    menu.querySelector("[data-menu-close]").addEventListener("click", function () { closeMenu(); });
+    menu.querySelectorAll("[data-menu-link]").forEach(function (a) { a.addEventListener("click", function () { closeMenu(true); }); });
+    addEventListener("keydown", function (e) { if (e.key === "Escape" && !menu.hidden) closeMenu(); });
+  }
+
+  /* ---- the header marks the section on screen ----------------------------------------------------- */
+  var links = [].slice.call(document.querySelectorAll(".hdr__link[href^='#']"));
+  if (links.length && "IntersectionObserver" in window) {
+    var byId = {};
+    links.forEach(function (a) { var el = document.getElementById(a.getAttribute("href").slice(1)); if (el) byId[el.id] = a; });
+    var spy = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        var a = byId[e.target.id]; if (!a) return;
+        if (e.isIntersecting) { links.forEach(function (o) { o.removeAttribute("aria-current"); }); a.setAttribute("aria-current", "true"); }
+        else if (a.getAttribute("aria-current")) a.removeAttribute("aria-current");
+      });
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    Object.keys(byId).forEach(function (id) { spy.observe(document.getElementById(id)); });
+  }
+
+  /* ---- the works: the film plays under the pointer, and the pointer becomes "play" ------------------- */
+  var fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
+  var grid = document.querySelector("[data-works]"), cur = document.querySelector(".cur");
+  if (fine && grid && !reduced) {
+    var live = null, timer = 0;
+    var stopLive = function () {
+      clearTimeout(timer);
+      if (!live) return;
+      var v = live.v, m = live.m; live = null;
+      v.classList.remove("is-on"); m.classList.remove("is-live");
+      setTimeout(function () { if (!v.classList.contains("is-on")) v.pause(); }, 600);
+    };
+    grid.querySelectorAll(".wk__btn[data-video]").forEach(function (b) {
+      var m = b.querySelector(".wk__media");
+      b.addEventListener("pointerenter", function () {
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+          if (live && live.m !== m) stopLive();
+          var v = m.querySelector(".wk__live");
+          if (!v) {
+            v = document.createElement("video"); v.className = "wk__live"; v.muted = true; v.loop = true; v.playsInline = true; v.preload = "auto";
+            v.setAttribute("aria-hidden", "true");
+            v.addEventListener("playing", function () { if (live && live.v === v) { v.classList.add("is-on"); m.classList.add("is-live"); } });
+            v.src = b.dataset.video + "#t=3";
+            m.insertBefore(v, m.querySelector(".wk__vf"));
+          }
+          live = { v: v, m: m };
+          var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
+          if (v.readyState >= 3) { v.classList.add("is-on"); m.classList.add("is-live"); }
+        }, 260);
+      });
+      b.addEventListener("pointerleave", stopLive);
+      b.addEventListener("click", stopLive);
+    });
+    if (cur) {
+      grid.classList.add("has-cur");
+      var tx = -200, ty = -200, cx = -200, cy = -200, on = false, raf = 0;
+      var loop = function () {
+        cx += (tx - cx) * 0.22; cy += (ty - cy) * 0.22;
+        cur.style.transform = "translate3d(" + cx.toFixed(1) + "px," + cy.toFixed(1) + "px,0)";
+        raf = Math.abs(tx - cx) + Math.abs(ty - cy) > 0.3 || on ? requestAnimationFrame(loop) : 0;
+      };
+      grid.addEventListener("pointermove", function (e) {
+        tx = e.clientX; ty = e.clientY;
+        var over = !!(e.target.closest && e.target.closest(".wk__btn[data-video]"));
+        if (over !== on) { on = over; cur.classList.toggle("is-on", on); }
+        if (!on) { cx = tx; cy = ty; }
+        if (!raf) raf = requestAnimationFrame(loop);
+      });
+      var hideCur = function () { on = false; cur.classList.remove("is-on"); };
+      grid.addEventListener("pointerleave", hideCur);
+      grid.querySelectorAll(".wk__btn[data-video]").forEach(function (b) { b.addEventListener("pointerleave", hideCur); b.addEventListener("click", hideCur); });
+      addEventListener("scroll", hideCur, { passive: true });
+      document.addEventListener("pointerover", function (e) { if (!grid.contains(e.target)) hideCur(); });
+    }
   }
 
   /* ---- services: the clip beside the line ------------------------------------------------------ */

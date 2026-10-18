@@ -87,7 +87,7 @@ html:not(.is-loading) .loader { opacity: 0; visibility: hidden; }
 .hdr.is-stuck { background: rgba(11, 11, 12, 0.82); -webkit-backdrop-filter: blur(14px) saturate(1.1); backdrop-filter: blur(14px) saturate(1.1); box-shadow: 0 1px 0 var(--line); }
 html.is-loading .hdr { transform: translateY(-100%); }
 .hdr__brand { display: flex; align-items: center; color: var(--paper); }
-.logo { width: 9.6rem; height: auto; overflow: visible; }
+.logo { width: 9.6rem; height: auto; overflow: visible; direction: ltr; unicode-bidi: isolate; }   /* the name is Latin in every language: in Arabic its text ran left of the box */
 .logo__name { font: 800 27px/1 var(--f-sans); font-stretch: 125%; letter-spacing: 0.06em; fill: currentColor; }
 .logo__sub { font: 500 9.5px/1 var(--f-mono); letter-spacing: 0.32em; fill: var(--amber); }
 .logo__perf { fill: currentColor; opacity: 0.85; }
@@ -425,3 +425,78 @@ html[dir="rtl"] .foot__cols h3 { font: 600 0.8rem/1 var(--f-ar); letter-spacing:
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
 }
+
+/* ==========================================================================
+   Second pass (18.10): the phone menu, the section the reader is in, the
+   story's pictures, the works playing under the pointer, the showreel, the
+   film's last words with a way on, the studio's signature
+   ========================================================================== */
+/* the header marks the section on screen */
+.hdr__link[aria-current="true"] { color: var(--paper); }
+.hdr__link[aria-current="true"]::after { transform: none; }
+/* the phone's menu: a list of scenes, numbered like a slate */
+.hdr__menu { display: none; align-items: center; gap: 0.55rem; height: 2.5rem; padding: 0 0.85rem; border: 1px solid var(--line-2); font: 500 0.66rem/1 var(--f-mono); letter-spacing: 0.18em; text-transform: uppercase; }
+html[dir="rtl"] .hdr__menu { font: 600 0.8rem/1 var(--f-ar); letter-spacing: 0; }
+.hdr__menu i { display: block; width: 0.95rem; height: 1px; background: currentColor; box-shadow: 0 -4px 0 currentColor; margin-top: 4px; }
+.hdr__menu i + i { display: none; }
+@media (max-width: 720px) {
+  .hdr__menu { display: inline-flex; }
+  .hdr__cta { display: none; }
+  .hdr__nav > .lng { display: none; }
+}
+.menu { position: fixed; inset: 0; z-index: 80; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; padding: 0 var(--pad) calc(1.6rem + env(safe-area-inset-bottom)); background: var(--ink);
+  opacity: 0; transition: opacity 450ms var(--e-out); }
+.menu[hidden] { display: none; }
+.menu.is-open { opacity: 1; }
+.menu::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(90% 60% at 100% 0%, rgba(224, 164, 94, 0.12), transparent 60%); }
+.menu__top { position: relative; display: flex; align-items: center; justify-content: space-between; height: var(--hdr-h); }
+.menu__brand .logo { width: 8rem; color: var(--paper); }
+.menu__close { font: 500 0.66rem/1 var(--f-mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--paper-2); padding: 0.8rem 0; }
+html[dir="rtl"] .menu__close { font: 600 0.82rem/1 var(--f-ar); letter-spacing: 0; }
+.menu__list { position: relative; align-self: center; display: grid; gap: 0.2rem; counter-reset: m; }
+.menu__list a { display: flex; align-items: baseline; gap: 1.1rem; padding: 0.55rem 0; border-bottom: 1px solid var(--line); }
+.menu__n { font: 400 0.7rem/1 var(--f-mono); color: var(--amber); letter-spacing: 0.1em; }
+.menu__t { font: 300 clamp(2rem, 1.4rem + 4vw, 3rem)/1.05 var(--f-sans); font-stretch: 118%; letter-spacing: -0.02em; }
+html[dir="rtl"] .menu__t { font-family: var(--f-ar); font-weight: 400; line-height: 1.5; letter-spacing: 0; }
+.menu__list li { opacity: 0; transform: translate3d(0, 18px, 0); transition: opacity 600ms var(--e-out), transform 800ms var(--e-out); transition-delay: calc(var(--i, 0) * 55ms + 80ms); }
+.menu.is-open .menu__list li { opacity: 1; transform: none; }
+.menu__foot { position: relative; display: grid; gap: 1.1rem; }
+.menu__foot p { display: grid; gap: 0.35rem; font: 400 0.9rem/1.5 var(--f-sans); color: var(--paper-2); }
+.lng--menu { justify-self: start; }
+.lng--menu button { height: 2.4rem; min-width: 3rem; }
+html.has-menu body { overflow: hidden; }
+
+/* the story's strip: every frame carries a picture of the film */
+.reel__frame { align-content: start; gap: 0.9rem; padding: 0.7rem 0.7rem 1.5rem; }
+.reel__pic { display: block; aspect-ratio: 16 / 9; overflow: hidden; background: #000; margin-bottom: 0.6rem; }
+.reel__pic img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.92); transition: transform 1200ms var(--e-out); }
+.reel__frame:hover .reel__pic img { transform: scale(1.05); }
+.reel__frame b, .reel__frame h3, .reel__frame p { padding-inline: 0.9rem; }
+.reel__frame b { font-size: clamp(2.4rem, 1.9rem + 1.6vw, 3.4rem); }
+.reel__code { position: absolute; top: 1.1rem; inset-inline-start: 1.2rem; z-index: 1; font: 400 0.52rem/1 var(--f-mono); letter-spacing: 0.16em; color: rgba(242, 193, 133, 0.85); text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8); direction: ltr; }
+
+/* the works: a film plays under the pointer, the pointer becomes the lens's "play" */
+.wk__live { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 600ms var(--e-out); }
+.wk__live.is-on { opacity: 1; }
+.wk__media.is-live::after { opacity: 0.35; }
+.sec-head__side { display: grid; gap: 1.4rem; justify-items: start; }
+.reel-btn__play { width: 0; height: 0; border-style: solid; border-width: 0.32rem 0 0.32rem 0.55rem; border-color: transparent transparent transparent var(--amber-2); }
+html[dir="rtl"] .reel-btn__play { transform: scaleX(-1); }
+.cur { position: fixed; z-index: 60; left: 0; top: 0; pointer-events: none; transform: translate3d(-200px, -200px, 0); }
+.cur__ring { position: absolute; left: -2.6rem; top: -2.6rem; display: grid; place-items: center; align-content: center; gap: 0.3rem; width: 5.2rem; height: 5.2rem; border-radius: 50%;
+  background: rgba(239, 235, 228, 0.92); color: var(--ink); transform: scale(0); transition: transform 380ms var(--e-out); }
+.cur__ring i { width: 0; height: 0; border-style: solid; border-width: 0.36rem 0 0.36rem 0.6rem; border-color: transparent transparent transparent currentColor; margin-left: 0.15rem; }
+.cur__ring b { font: 600 0.56rem/1 var(--f-mono); letter-spacing: 0.2em; text-transform: uppercase; }
+html[dir="rtl"] .cur__ring b { font: 600 0.72rem/1 var(--f-ar); letter-spacing: 0; }
+.cur.is-on .cur__ring { transform: scale(1); }
+@media (hover: hover) and (pointer: fine) { .works.has-cur .wk__btn[data-video] { cursor: none; } .works.has-cur .wk__play { opacity: 0; } }
+
+/* the film's last words, with the way on */
+.film__go { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1.8rem; pointer-events: auto; }
+
+/* the studio's signature */
+.foot__sign { color: var(--muted); transition: color 300ms; }
+.foot__sign b { font-weight: 500; color: var(--paper-2); letter-spacing: 0.08em; }
+.foot__sign:hover, .foot__sign:hover b { color: var(--amber-2); }
+@media (max-width: 760px) { .foot__tc { display: none; } }
