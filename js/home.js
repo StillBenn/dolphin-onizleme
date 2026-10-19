@@ -12,24 +12,37 @@
   var html = document.documentElement;
   var sweep = document.querySelector(".leader__sweep");
   var num = document.querySelector("[data-leader]");
-  var shown = 0, lifted = false, t0 = performance.now();
-  var MIN_MS = 1100;                 /* even a cached visit sees the leader count once */
+  /* The count is paced, not the raw progress: the downloads report in leaps
+     (0.15, 0.3, 0.75, done), and a number tied to them sat on 3 and then
+     cut to 1. Each number gets one full turn of the sweep (a real leader),
+     at least PACE_MS for all three; while the frames are still on their way
+     the sweep runs ahead of them only slowly and never past most of the
+     last turn, and the leader lifts on the 1's completed turn. */
+  var target = 0, shown = 0, done = false, last = 0;
+  var PACE_MS = 1650;
 
-  function paint(p) {
-    shown = Math.max(shown, Math.min(1, p));
-    if (sweep) sweep.style.setProperty("--p", shown.toFixed(3));
-    if (num) num.textContent = String(Math.max(1, 3 - Math.floor(shown * 3)));
+  function paint(p) { target = Math.max(target, Math.min(1, p)); }
+  function draw() {
+    var k = Math.min(2, Math.floor(shown * 3));
+    if (sweep) sweep.style.setProperty("--p", (shown >= 1 ? 1 : shown * 3 - k).toFixed(3));
+    var n = String(3 - k);
+    if (num && num.textContent !== n) num.textContent = n;
   }
-  function lift() {
-    if (lifted) return;
-    lifted = true;
-    paint(1);
-    setTimeout(function () {
+  function tick(now) {
+    var dt = Math.min(64, now - (last || now)); last = now;
+    var ahead = done ? 1 : Math.min(0.9, target + 0.3);
+    shown = Math.min(ahead, shown + dt / (shown < target || done ? PACE_MS : PACE_MS * 4));
+    draw();
+    if (done && shown >= 1) {
       html.classList.remove("is-loading");
       dispatchEvent(new Event("intro:done"));
       setTimeout(function () { html.classList.add("is-written"); }, 1800);
-    }, Math.max(0, MIN_MS - (performance.now() - t0)));
+      return;
+    }
+    requestAnimationFrame(tick);
   }
+  function lift() { if (!done) { done = true; target = 1; } }
+  requestAnimationFrame(tick);
   window.FilmIntro = { progress: paint, done: lift };
   setTimeout(lift, 16000);           /* never trapped behind the leader */
 
