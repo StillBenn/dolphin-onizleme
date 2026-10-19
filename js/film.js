@@ -907,7 +907,7 @@ export async function mountFilm(root, primary = true) {
   /* Touch scrolling is native and inertial, wheel scrolling is already eased
      by scroll.js — the frame still gets its own light easing so a flick reads
      as a camera move rather than a jump cut. */
-  const RATE = fine ? 18 : 11;
+  const RATE = fine ? 11 : 9;          /* 19.10: softer (18 / 11 before) — the picture glides after the scroll like a camera on a dolly */
   /* How fast the playhead may travel (frames a second): what the device can
      decode on a stride and keep sharp. A flick faster than this is followed a
      moment behind, as a camera that keeps its focus. */
@@ -933,6 +933,7 @@ export async function mountFilm(root, primary = true) {
   let shown = P0, lastT = performance.now(), running = false, fpsT = lastT, fpsN = 0, fps = 0, stageO = 1, endShown = -1;
   let vel = 0, lastTarget = P0, lastShown = P0, hi = 0, hiFrames = 0, loFrames = 0, ahead = 3, stride = 1, behind = 0;
   let sharpOn = -1, missT = 0, drawn = false;     /* the sharp frame on screen (-1: none); since when none was */
+  let restT = 0, lastRaw = -1;     /* when the scroll last moved the playhead (a reader at rest gets a whole frame) */
   let cuts = 0, settled = 0, wasAuto = !!AUTO;                      /* cuts so far (js/sound.js skips what a cut passes over); ticks the target has held still */
   /* the furthest point from `from` toward `to` that downloaded frames can show (never back) */
   const reach = (from, to) => {
@@ -1020,6 +1021,13 @@ export async function mountFilm(root, primary = true) {
     let target = frameAt(p * totalVh + vh0);
     const onAuto = autoP < 1 && scrollY - top < 2;
     if (onAuto) target = autoP * AUTO;
+    /* At rest, on a whole frame: a playhead standing between two frames shows both at once, and on a fast
+       move (the slate pulled away, the whip to the lens) that is a double image. Once the scroll has held
+       still for a moment the playhead eases on to the nearest frame — half a frame at most. */
+    const rawTarget = target;
+    if (Math.abs(rawTarget - lastRaw) > 0.002) restT = now;
+    lastRaw = rawTarget;
+    if (!onAuto && now - restT > 140) target = Math.round(target);
     const leap = Math.abs(target - lastTarget);
     settled = leap < 1 ? settled + 1 : 0;
     /* a cut: a jump, or a playhead far behind once the reader's own moment is
@@ -1223,7 +1231,7 @@ export async function mountFilm(root, primary = true) {
     /* Keep running only while something is still changing on screen: the
        playhead easing, a decode in flight, the sharp layer fading in (which
        also covers "the pair has not downloaded yet"), the intro. */
-    if (visible && (Math.abs(target - shown) > 0.001 || store.pending.size || making.size || introP < 1 || autoP < 1 || (hiTarget && hi < 1) || wait || hud)) {
+    if (visible && (Math.abs(target - shown) > 0.001 || (!onAuto && now - restT < 240 && Math.abs(rawTarget - Math.round(rawTarget)) > 0.001) || store.pending.size || making.size || introP < 1 || autoP < 1 || (hiTarget && hi < 1) || wait || hud)) {
       requestAnimationFrame(frame);
     } else {
       running = false;

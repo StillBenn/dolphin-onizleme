@@ -254,14 +254,8 @@ html[dir="rtl"] .chip { font: 500 0.86rem/1 var(--f-ar); }
 .wk__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 1200ms var(--e-out); }   /* no colour filter, no resting scale: each built a layer of its own that froze the frame the posters came in (30-70 ms, measured) */
 .wk__media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(6, 6, 7, 0.7) 0%, transparent 46%); opacity: 0.85; transition: opacity 500ms; }
 .wk__vf { position: absolute; inset: 0.7rem; z-index: 2; color: rgba(239, 235, 228, 0.0); transition: color 500ms, inset 600ms var(--e-out); }
-.wk__play { position: absolute; z-index: 2; inset-inline-start: 0.95rem; bottom: 0.9rem; display: flex; align-items: center; gap: 0.55rem; font: 500 0.64rem/1 var(--f-mono); letter-spacing: 0.2em; text-transform: uppercase; color: var(--paper);
-  opacity: 0.8; transition: opacity 400ms, transform 600ms var(--e-out); }
-html[dir="rtl"] .wk__play { font: 600 0.78rem/1 var(--f-ar); letter-spacing: 0; }
-.wk__play i { width: 0; height: 0; border-style: solid; border-width: 0.32rem 0 0.32rem 0.55rem; border-color: transparent transparent transparent var(--amber-2); }
-html[dir="rtl"] .wk__play i { transform: scaleX(-1); }
 .wk__btn:hover .wk__media img, .wk__btn:focus-visible .wk__media img { transform: scale(1.06); }
 .wk__btn:hover .wk__vf, .wk__btn:focus-visible .wk__vf { color: rgba(239, 235, 228, 0.85); inset: 1rem; }
-.wk__btn:hover .wk__play { opacity: 1; transform: translateX(3px); }
 .wk__cap { display: grid; gap: 0.25rem; padding-inline-end: 2.2rem; }
 .wk__cap b { font: 600 0.92rem/1.25 var(--f-sans); font-stretch: 110%; letter-spacing: 0.01em; }
 .wk__cap span { font-size: 0.86rem; line-height: 1.45; color: var(--muted); }
@@ -463,14 +457,6 @@ html.has-menu body { overflow: hidden; }
 .sec-head__side { display: grid; gap: 1.4rem; justify-items: start; }
 .reel-btn__play { width: 0; height: 0; border-style: solid; border-width: 0.32rem 0 0.32rem 0.55rem; border-color: transparent transparent transparent var(--amber-2); }
 html[dir="rtl"] .reel-btn__play { transform: scaleX(-1); }
-.cur { position: fixed; z-index: 60; left: 0; top: 0; pointer-events: none; transform: translate3d(-200px, -200px, 0); }
-.cur__ring { position: absolute; left: -2.6rem; top: -2.6rem; display: grid; place-items: center; align-content: center; gap: 0.3rem; width: 5.2rem; height: 5.2rem; border-radius: 50%;
-  background: rgba(239, 235, 228, 0.92); color: var(--ink); transform: scale(0); transition: transform 380ms var(--e-out); }
-.cur__ring i { width: 0; height: 0; border-style: solid; border-width: 0.36rem 0 0.36rem 0.6rem; border-color: transparent transparent transparent currentColor; margin-left: 0.15rem; }
-.cur__ring b { font: 600 0.56rem/1 var(--f-mono); letter-spacing: 0.2em; text-transform: uppercase; }
-html[dir="rtl"] .cur__ring b { font: 600 0.72rem/1 var(--f-ar); letter-spacing: 0; }
-.cur.is-on .cur__ring { transform: scale(1); }
-@media (hover: hover) and (pointer: fine) { .works.has-cur .wk__btn[data-video] { cursor: none; } .works.has-cur .wk__play { opacity: 0; } }
 
 /* the film's last words, with the way on */
 .film__go { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1.8rem; pointer-events: auto; }
@@ -479,7 +465,6 @@ html[dir="rtl"] .cur__ring b { font: 600 0.72rem/1 var(--f-ar); letter-spacing: 
 .foot__sign { color: var(--muted); transition: color 300ms; }
 .foot__sign b { font-weight: 500; color: var(--paper-2); letter-spacing: 0.08em; }
 .foot__sign:hover, .foot__sign:hover b { color: var(--amber-2); }
-@media (max-width: 760px) { .foot__tc { display: none; } }
 
 /* ==========================================================================
    Soft corners (18.10, Bünyamin: "köşeli şeyler olmasın, köşeler yumuşak

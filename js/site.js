@@ -23,7 +23,7 @@
   /* ---- scroll-linked parts, one rAF ---------------------------------------- */
   var film = document.querySelector('.film[data-film="main"]');
   var tc = document.querySelector("[data-tc]");
-  var FRAMES = 706, FPS = 25;                 /* the film's length (film/film.json, its chapters less the dissolve) */
+  var FRAMES = 734, FPS = 25;                 /* the film's length (film/film.json, its chapters less the dissolve) */
   var reelBox = document.querySelector("[data-reel]"), strip = reelBox && reelBox.querySelector(".reel__strip");
   var story = document.querySelector(".story");
   var credits = document.querySelector(".credits"), roll = document.querySelector("[data-roll]"), list = roll && roll.querySelector(".credits__list");
@@ -232,9 +232,9 @@
     Object.keys(byId).forEach(function (id) { spy.observe(document.getElementById(id)); });
   }
 
-  /* ---- the works: the film plays under the pointer, and the pointer becomes "play" ------------------- */
+  /* ---- the works: the film plays under the pointer (the pointer itself stays the browser's hand) ------- */
   var fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
-  var grid = document.querySelector("[data-works]"), cur = document.querySelector(".cur");
+  var grid = document.querySelector("[data-works]");
   if (fine && grid && !reduced) {
     var live = null, timer = 0;
     var stopLive = function () {
@@ -266,27 +266,6 @@
       b.addEventListener("pointerleave", stopLive);
       b.addEventListener("click", stopLive);
     });
-    if (cur) {
-      grid.classList.add("has-cur");
-      var tx = -200, ty = -200, cx = -200, cy = -200, on = false, raf = 0;
-      var loop = function () {
-        cx += (tx - cx) * 0.22; cy += (ty - cy) * 0.22;
-        cur.style.transform = "translate3d(" + cx.toFixed(1) + "px," + cy.toFixed(1) + "px,0)";
-        raf = Math.abs(tx - cx) + Math.abs(ty - cy) > 0.3 || on ? requestAnimationFrame(loop) : 0;
-      };
-      grid.addEventListener("pointermove", function (e) {
-        tx = e.clientX; ty = e.clientY;
-        var over = !!(e.target.closest && e.target.closest(".wk__btn[data-video]"));
-        if (over !== on) { on = over; cur.classList.toggle("is-on", on); }
-        if (!on) { cx = tx; cy = ty; }
-        if (!raf) raf = requestAnimationFrame(loop);
-      });
-      var hideCur = function () { on = false; cur.classList.remove("is-on"); };
-      grid.addEventListener("pointerleave", hideCur);
-      grid.querySelectorAll(".wk__btn[data-video]").forEach(function (b) { b.addEventListener("pointerleave", hideCur); b.addEventListener("click", hideCur); });
-      addEventListener("scroll", hideCur, { passive: true });
-      document.addEventListener("pointerover", function (e) { if (!grid.contains(e.target)) hideCur(); });
-    }
   }
 
   /* ---- services: each scene's clip plays while it is on screen ------------------------------------------- */
