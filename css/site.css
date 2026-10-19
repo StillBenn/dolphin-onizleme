@@ -746,3 +746,7 @@ html[dir="rtl"] .filter__count { font: 600 0.84rem/1 var(--f-ar); letter-spacing
   .works--all { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (prefers-reduced-motion: reduce) { .phero__pic img { transform: none; } }
+
+/* the film's words on a card over the book: a long word ("ANADOLU'DAN") must fit the card on every screen */
+.film__beat--card .film__title { font-size: clamp(1.8rem, 0.7rem + 2.5vw, 3.5rem); }
+@media (max-width: 760px) { .film__beat--card .film__title { font-size: clamp(1.5rem, 0.35rem + 5.4vw, 2.2rem); } }

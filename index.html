@@ -17,8 +17,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,200..800&family=JetBrains+Mono:wght@400;500&family=Noto+Kufi+Arabic:wght@300;400;600;700&display=swap">
-<link rel="preload" href="./film/film.json?v=5" as="fetch" crossorigin>
-<link rel="stylesheet" href="./css/site.css?v=5">
+<link rel="preload" href="./film/film.json?v=6" as="fetch" crossorigin>
+<link rel="stylesheet" href="./css/site.css?v=6">
 <script>try{var x=JSON.parse(sessionStorage.getItem("dl-fx")||"null");if(x&&Date.now()-x.t<2600){document.documentElement.classList.add("fx-in");sessionStorage.removeItem("dl-fx")}}catch(e){}</script>
 <script type="application/ld+json">
 {
@@ -82,82 +82,82 @@
 
 <main id="top">
 
-  <!-- ===== The film: one commercial, from the slate to the screen ===============================
-       data-ch: 1 the slate and the lights, 2 the set and the pour, 3 the cinema camera's lens, 4 the
-       cutting room, 5 the screening; data-in / data-out: the stretch of the chapter the words stay.
-       The opening has no words over it: the slate itself reads DOLPHIN AJANS; the first line comes as it is
-       pulled away and the lamps bang on. Over the light table the words sit on a dark card. -->
-  <section class="film" data-film="main" data-manifest="./film/film.json?v=5" aria-label="Dolphin Ajans — film">
+  <!-- ===== The film: Kâğıttan Ekrana — every commercial starts on paper (05-film/scripts/scene_kagit.py) =========
+       data-ch: 1 the lamp and the book, 2 the drawing that draws itself and comes to colour, 3 inside the screen,
+       4 the pages turning (the years), 5 the broadcast plan (the journey), 6 the empty page (the next film);
+       data-in / data-out: the stretch of the chapter the words stay. Over the bright paper the words sit on a card. -->
+  <section class="film" data-film="main" data-manifest="./film/film.json?v=6" aria-label="Dolphin Ajans — film">
     <div class="film__stage">
       <picture class="film__poster">
         <source media="(orientation: portrait)" srcset="./film/poster-9x16.webp">
-        <img src="./film/poster-16x9.webp" alt="Karanlık stüdyoda açık bir klaket: Dolphin Ajans, sahne 1, çekim 1" width="1920" height="1080" decoding="async">
+        <img src="./film/poster-16x9.webp" alt="Lamba ışığında deri bir storyboard defteri: Dolphin Ajans" width="1920" height="1080" decoding="async">
       </picture>
       <canvas class="film__canvas" aria-hidden="true"></canvas>
 
-      <div class="film__beat" data-ch="1" data-in="0.5" data-out="1.0">
+      <div class="film__beat" data-ch="1" data-in="0.62" data-out="1.0">
         <p class="film__label label"><i class="dot"></i>Dolphin Ajans · Gaziantep · 1994</p>
         <h1 class="film__title">
-          <span class="film__line"><span>Bir Anadolu</span></span>
-          <span class="film__line"><span><em>reklamcısı.</em></span></span>
+          <span class="film__line"><span>Her film</span></span>
+          <span class="film__line"><span><em>bir kâğıtta başlar.</em></span></span>
         </h1>
         <p class="film__lead">Otuz yılı aşkın süredir markaların filmini çekiyoruz: fikirden yayına, tam hizmet.</p>
       </div>
-      <div class="film__beat" data-ch="2" data-in="0.02" data-out="0.36">
-        <p class="film__label label">Sahne 01 — Işık</p>
+      <div class="film__beat film__beat--card" data-ch="2" data-in="0.04" data-out="0.42">
+        <p class="film__label label">Sahne 01 — Fikir</p>
         <h2 class="film__title">
-          <span class="film__line"><span>Işıklar yanar,</span></span>
-          <span class="film__line"><span><em>sahne kurulur.</em></span></span>
+          <span class="film__line"><span>Önce</span></span>
+          <span class="film__line"><span><em>bir çizim.</em></span></span>
+        </h2>
+        <p class="film__lead">Her reklam bir kalemle başlar: hikâyeyi önce kâğıtta kurarız.</p>
+      </div>
+      <div class="film__beat film__beat--card" data-ch="2" data-in="0.5" data-out="0.9">
+        <p class="film__label label">Sahne 02 — Çekim</p>
+        <h2 class="film__title">
+          <span class="film__line"><span>Sonra</span></span>
+          <span class="film__line"><span><em>gerçek olur.</em></span></span>
         </h2>
         <p class="film__lead">1997'den beri kendi film ve montaj stüdyomuzla çekiyoruz.</p>
       </div>
-      <div class="film__beat" data-ch="2" data-in="0.5" data-out="0.95">
-        <p class="film__label label">Sahne 02 — Çekim</p>
+      <div class="film__beat film__beat--card" data-ch="3" data-in="0.02" data-out="0.42">
+        <p class="film__label label">Sahne 03 — Ekran</p>
         <h2 class="film__title">
-          <span class="film__line"><span>Her ürün</span></span>
-          <span class="film__line"><span><em>kendi ışığında.</em></span></span>
+          <span class="film__line"><span>Kâğıttan</span></span>
+          <span class="film__line"><span><em>ekrana.</em></span></span>
         </h2>
-        <p class="film__lead">Senaryodan son kareye kadar bütün yapım bizim elimizde.</p>
+        <p class="film__lead">Ulusal kanallarda, markaların en bilinen reklamları.</p>
       </div>
-      <div class="film__beat" data-ch="3" data-in="0.16" data-out="0.7">
-        <p class="film__label label">Sahne 03 — Objektif</p>
+      <div class="film__beat film__beat--card" data-ch="4" data-in="0.12" data-out="0.62">
+        <p class="film__label label">Sahne 04 — Yıllar</p>
         <h2 class="film__title">
-          <span class="film__line"><span>Ayrıntı,</span></span>
-          <span class="film__line"><span><em>markanın sesidir.</em></span></span>
+          <span class="film__line"><span>Otuz yıl,</span></span>
+          <span class="film__line"><span><em>yüzlerce film.</em></span></span>
         </h2>
-        <p class="film__lead">Ürününüzü en doğru açıdan, en doğru ışıkta gösteririz.</p>
+        <p class="film__lead">Çaydan halıya, salçadan bebek bakımına: Anadolu'nun güçlü markaları.</p>
       </div>
-      <div class="film__beat film__beat--card" data-ch="4" data-in="0.16" data-out="0.82">
-        <p class="film__label label">Sahne 04 — Kurgu</p>
+      <div class="film__beat film__beat--card" data-ch="5" data-in="0.36" data-out="0.92">
+        <p class="film__label label">Sahne 05 — Yolculuk</p>
         <h2 class="film__title">
-          <span class="film__line"><span>Hikâye</span></span>
-          <span class="film__line"><span><em>kurguda doğar.</em></span></span>
+          <span class="film__line"><span>Anadolu'dan</span></span>
+          <span class="film__line"><span><em>Körfez'e.</em></span></span>
         </h2>
-        <p class="film__lead">Kurgu, renk, ses ve grafik: filmin ritmini masada kurarız.</p>
+        <p class="film__lead">Gaziantep'ten Erbil'e ve Dubai'ye: Türk markalarını bölgenin ekranlarına taşıyoruz.</p>
       </div>
-      <div class="film__beat" data-ch="5" data-in="0.08" data-out="0.46">
-        <p class="film__label label">Sahne 05 — Yayın</p>
-        <h2 class="film__title">
-          <span class="film__line"><span>Ekrandan</span></span>
-          <span class="film__line"><span><em>milyonlara.</em></span></span>
-        </h2>
-        <p class="film__lead">Ulusal kanallar, Ortadoğu ekranları, radyo ve dijital: medya planlama ve satın alma.</p>
-      </div>
-      <div class="film__beat film__beat--end" data-ch="5" data-in="0.8" data-out="1.6">
+      <div class="film__beat film__beat--end" data-ch="6" data-in="0.72" data-out="1.6">
         <p class="film__label label">Dolphin Ajans</p>
         <h2 class="film__title">
-          <span class="film__line"><span>Markanızın filmini</span></span>
-          <span class="film__line"><span><em>birlikte çekelim.</em></span></span>
+          <span class="film__line"><span>Sıradaki sayfa</span></span>
+          <span class="film__line"><span><em>sizin markanız.</em></span></span>
         </h2>
         <p class="film__lead film__go"><a class="btn btn--solid" href="#iletisim">Projenizi anlatın</a><a class="btn btn--line" href="#isler">İşlerimizi izleyin</a></p>
       </div>
 
       <nav class="film__chapters" aria-label="Filmin sahneleri" hidden>
-        <button type="button" data-chapter="0"><i></i><span>Klaket</span></button>
-        <button type="button" data-chapter="1"><i></i><span>Set</span></button>
-        <button type="button" data-chapter="2"><i></i><span>Objektif</span></button>
-        <button type="button" data-chapter="3"><i></i><span>Kurgu</span></button>
-        <button type="button" data-chapter="4"><i></i><span>Gösterim</span></button>
+        <button type="button" data-chapter="0"><i></i><span>Işık</span></button>
+        <button type="button" data-chapter="1"><i></i><span>Çizim</span></button>
+        <button type="button" data-chapter="2"><i></i><span>Ekran</span></button>
+        <button type="button" data-chapter="3"><i></i><span>Yıllar</span></button>
+        <button type="button" data-chapter="4"><i></i><span>Yolculuk</span></button>
+        <button type="button" data-chapter="5"><i></i><span>Sıradaki</span></button>
       </nav>
       <a class="film__skip" href="#hikaye"><span class="film__skip-t">Filmi geç</span><svg class="film__skip-arr" viewBox="0 0 12 16" aria-hidden="true"><path d="M6 1.5v12M1.8 9.4 6 13.6l4.2-4.2"/></svg><i class="film__skip-line" aria-hidden="true"></i></a>
       <span class="film__hint" aria-hidden="true"><i></i></span>
@@ -287,11 +287,11 @@
   </div>
 </dialog>
 
-<script src="./js/i18n.js?v=5"></script>
-<script src="./js/scroll.js?v=5" defer></script>
-<script src="./js/home.js?v=5" defer></script>
-<script src="./js/site.js?v=5" defer></script>
-<script src="./js/pagefx.js?v=5" defer></script>
-<script type="module" src="./js/film.js?v=5"></script>
+<script src="./js/i18n.js?v=6"></script>
+<script src="./js/scroll.js?v=6" defer></script>
+<script src="./js/home.js?v=6" defer></script>
+<script src="./js/site.js?v=6" defer></script>
+<script src="./js/pagefx.js?v=6" defer></script>
+<script type="module" src="./js/film.js?v=6"></script>
 </body>
 </html>

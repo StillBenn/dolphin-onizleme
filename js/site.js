@@ -23,7 +23,7 @@
   /* ---- scroll-linked parts, one rAF ---------------------------------------- */
   var film = document.querySelector('.film[data-film="main"]');
   var tc = document.querySelector("[data-tc]");
-  var FRAMES = 734, FPS = 25;                 /* the film's length (film/film.json, its chapters less the dissolve) */
+  var FRAMES = 870, FPS = 25;                 /* the film's length (film/film.json, its chapters less the dissolve) */
   var reelBox = document.querySelector("[data-reel]"), strip = reelBox && reelBox.querySelector(".reel__strip");
   var story = document.querySelector(".story");
   var credits = document.querySelector(".credits"), roll = document.querySelector("[data-roll]"), list = roll && roll.querySelector(".credits__list");
