@@ -19,7 +19,7 @@
      the sweep runs ahead of them only slowly and never past most of the
      last turn, and the leader lifts on the 1's completed turn. */
   var target = 0, shown = 0, done = false, last = 0;
-  var PACE_MS = 1650;
+  var PACE_MS = 2100;               /* ~0.7 s a number: at 0.55 s the count read a touch hurried */
 
   function paint(p) { target = Math.max(target, Math.min(1, p)); }
   function draw() {
